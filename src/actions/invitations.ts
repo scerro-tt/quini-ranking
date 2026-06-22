@@ -1,6 +1,7 @@
 'use server'
 
 import { db } from '@/lib/db'
+import { sendInvitationEmail } from '@/lib/email'
 import crypto from 'crypto'
 
 export async function generateInvitation(email: string, nickname: string) {
@@ -32,14 +33,23 @@ export async function generateInvitation(email: string, nickname: string) {
     },
   })
 
-  // Retornar URL de invitación (sin enviar email por ahora)
+  // Generar URL de invitación
   const invitationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/accept-invitation/${token}`
+
+  // Enviar email
+  const emailResult = await sendInvitationEmail(email, nickname, invitationUrl)
+
+  if (emailResult.error) {
+    // Eliminar invitación si el email falla
+    await db.invitation.delete({ where: { id: invitation.id } })
+    return { error: 'Error al enviar email de invitación' }
+  }
 
   return {
     success: true,
     invitation,
     invitationUrl,
-    message: `URL de invitación: ${invitationUrl}`
+    message: `✓ Invitación enviada a ${email}`
   }
 }
 
