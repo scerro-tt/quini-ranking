@@ -25,6 +25,20 @@ model User {
   @@index([email])
 }
 
+model Invitation {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  token         String     @unique
+  nickname      String     // Nickname asignado para este usuario
+  used          Boolean    @default(false)
+  usedAt        DateTime?
+  expiresAt     DateTime
+  createdAt     DateTime   @default(now())
+
+  @@index([token])
+  @@index([email])
+}
+
 model Season {
   id            String     @id @default(cuid())
   name          String     // "2025-2026", "2024-2025"

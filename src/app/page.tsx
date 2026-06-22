@@ -22,14 +22,9 @@ export default async function Home() {
               </Link>
             </>
           ) : (
-            <>
-              <Link href="/login">
-                <Button variant="outline">Ingresar</Button>
-              </Link>
-              <Link href="/register">
-                <Button>Registrarse</Button>
-              </Link>
-            </>
+            <Link href="/login">
+              <Button>Ingresar</Button>
+            </Link>
           )}
         </div>
       </nav>
