@@ -1,0 +1,142 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String     @id @default(cuid())
+  email         String     @unique
+  nickname      String     @unique
+  passwordHash  String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  // Relations
+  predictions   Prediction[]
+  seasonUsers   SeasonUser[]
+
+  @@index([email])
+}
+
+model Season {
+  id            String     @id @default(cuid())
+  name          String     // "2025-2026", "2024-2025"
+  startDate     DateTime
+  endDate       DateTime?
+  isActive      Boolean    @default(true)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  // Relations
+  jornadas      Jornada[]
+  seasonUsers   SeasonUser[]
+  rankings      RankingResult[]
+
+  @@unique([name])
+  @@index([isActive])
+}
+
+model SeasonUser {
+  id            String     @id @default(cuid())
+  seasonId      String
+  userId        String
+  hasWonPrize   Boolean    @default(false) // ¿Ha cobrado al menos un premio?
+
+  season        Season     @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([seasonId, userId])
+  @@index([seasonId])
+}
+
+model Jornada {
+  id            String     @id @default(cuid())
+  seasonId      String
+  weekNumber    Int        // 1-42 aproximadamente
+  matchDate     DateTime   // Fecha del partido
+  boleto        String?    // JSON string con pronósticos
+  prizeU        Float?     // Premio del 10 aciertos (U en el documento)
+  totalMatches  Int        @default(14) // Cantidad de partidos en la jornada
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  season        Season     @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  predictions   Prediction[]
+  prizes        Prize[]
+
+  @@unique([seasonId, weekNumber])
+  @@index([seasonId])
+}
+
+model Prediction {
+  id            String     @id @default(cuid())
+  jornadaId     String
+  userId        String
+  hits          Int        // Número de aciertos (4-14)
+  points        Float      @default(0) // Puntos por aciertos
+  rawPoints     Float      @default(0) // Puntos sin activar (antes de cobrar un premio)
+  notes         String?    // Notas adicionales
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  jornada       Jornada    @relation(fields: [jornadaId], references: [id], onDelete: Cascade)
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([jornadaId, userId])
+  @@index([jornadaId])
+  @@index([userId])
+}
+
+model Prize {
+  id            String     @id @default(cuid())
+  jornadaId     String
+  userId        String?    // null si nadie en el grupo cobró
+  hits          Int        // 10, 11, 12, 13, 14
+  amount        Float      // Cantidad en euros
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  jornada       Jornada    @relation(fields: [jornadaId], references: [id], onDelete: Cascade)
+
+  @@index([jornadaId])
+}
+
+model RankingResult {
+  id            String     @id @default(cuid())
+  seasonId      String
+  userId        String
+  totalPrizes   Float      @default(0) // Total en euros ganados
+  totalPoints   Float      @default(0) // Total de puntos por aciertos
+  validPoints   Float      @default(0) // Puntos válidos (solo si ha cobrado)
+  position      Int?       // 1, 2, 3, 4...
+  rawPoints     Float      @default(0) // Puntos sin validar
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  season        Season     @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+
+  @@unique([seasonId, userId])
+  @@index([seasonId])
+  @@index([position])
+}
+
+model EmailLog {
+  id            String     @id @default(cuid())
+  userId        String?
+  email         String
+  subject       String
+  status        String     // "sent", "failed", "pending"
+  error         String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@index([email])
+  @@index([createdAt])
+}
