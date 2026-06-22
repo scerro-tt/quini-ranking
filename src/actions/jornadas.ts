@@ -12,13 +12,7 @@ export async function createJornada(
   const session = await auth()
   if (!session?.user?.id) throw new Error('Not authenticated')
 
-  const season = await db.season.findFirst({
-    where: {
-      id: seasonId,
-      seasonUsers: { some: { userId: session.user.id } },
-    },
-  })
-
+  const season = await db.season.findUnique({ where: { id: seasonId } })
   if (!season) throw new Error('Season not found')
 
   const existing = await db.jornada.findUnique({

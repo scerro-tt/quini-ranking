@@ -19,14 +19,6 @@ export async function createSeason(name: string, startDate: Date, endDate?: Date
     },
   })
 
-  // Add current user to season
-  await db.seasonUser.create({
-    data: {
-      seasonId: season.id,
-      userId: session.user.id,
-    },
-  })
-
   return { success: true, season }
 }
 
@@ -34,12 +26,8 @@ export async function getSeasonsForUser() {
   const session = await auth()
   if (!session?.user?.id) throw new Error('Not authenticated')
 
+  // Todos los usuarios ven todas las temporadas
   const seasons = await db.season.findMany({
-    where: {
-      seasonUsers: {
-        some: { userId: session.user.id },
-      },
-    },
     include: {
       _count: { select: { jornadas: true } },
     },
@@ -53,14 +41,11 @@ export async function getSeasonById(seasonId: string) {
   const session = await auth()
   if (!session?.user?.id) throw new Error('Not authenticated')
 
-  const season = await db.season.findFirst({
-    where: {
-      id: seasonId,
-      seasonUsers: { some: { userId: session.user.id } },
-    },
+  const season = await db.season.findUnique({
+    where: { id: seasonId },
     include: {
       jornadas: { orderBy: { weekNumber: 'asc' } },
-      rankings: { where: { userId: session.user.id } },
+      rankings: true,
     },
   })
 
@@ -72,13 +57,7 @@ export async function updateSeason(seasonId: string, data: { name?: string; endD
   const session = await auth()
   if (!session?.user?.id) throw new Error('Not authenticated')
 
-  const season = await db.season.findFirst({
-    where: {
-      id: seasonId,
-      seasonUsers: { some: { userId: session.user.id } },
-    },
-  })
-
+  const season = await db.season.findUnique({ where: { id: seasonId } })
   if (!season) throw new Error('Season not found')
 
   const updated = await db.season.update({
@@ -93,13 +72,7 @@ export async function deleteSeason(seasonId: string) {
   const session = await auth()
   if (!session?.user?.id) throw new Error('Not authenticated')
 
-  const season = await db.season.findFirst({
-    where: {
-      id: seasonId,
-      seasonUsers: { some: { userId: session.user.id } },
-    },
-  })
-
+  const season = await db.season.findUnique({ where: { id: seasonId } })
   if (!season) throw new Error('Season not found')
 
   await db.season.delete({ where: { id: seasonId } })

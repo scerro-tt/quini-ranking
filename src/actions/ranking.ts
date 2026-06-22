@@ -7,12 +7,8 @@ export async function calculateAndSaveRanking(seasonId: string) {
   const session = await auth()
   if (!session?.user?.id) throw new Error('Not authenticated')
 
-  // Verify user has access to this season
-  const season = await db.season.findFirst({
-    where: {
-      id: seasonId,
-      seasonUsers: { some: { userId: session.user.id } },
-    },
+  const season = await db.season.findUnique({
+    where: { id: seasonId },
     include: {
       seasonUsers: true,
       jornadas: {
@@ -141,13 +137,7 @@ export async function getRankingForSeason(seasonId: string) {
   const session = await auth()
   if (!session?.user?.id) throw new Error('Not authenticated')
 
-  const season = await db.season.findFirst({
-    where: {
-      id: seasonId,
-      seasonUsers: { some: { userId: session.user.id } },
-    },
-  })
-
+  const season = await db.season.findUnique({ where: { id: seasonId } })
   if (!season) throw new Error('Season not found')
 
   const rankings = await db.rankingResult.findMany({
