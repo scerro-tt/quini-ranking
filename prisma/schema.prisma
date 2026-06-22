@@ -97,15 +97,38 @@ model Prediction {
   points        Float      @default(0) // Puntos por aciertos
   rawPoints     Float      @default(0) // Puntos sin activar (antes de cobrar un premio)
   notes         String?    // Notas adicionales
+  boletoImageUrl String?   // URL de imagen del boleto
+  boletoUploadDate DateTime? // Fecha de subida del boleto
+  hasResults    Boolean    @default(false) // ¿Se ingresaron los resultados?
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
   jornada       Jornada    @relation(fields: [jornadaId], references: [id], onDelete: Cascade)
   user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  partidoResults PartidoResult[]
 
   @@unique([jornadaId, userId])
   @@index([jornadaId])
   @@index([userId])
+}
+
+model PartidoResult {
+  id                    String     @id @default(cuid())
+  predictionId          String
+  numero                Int        // 1-14
+  equipo1               String     // Team 1
+  equipo2               String     // Team 2
+  userPrediction        String     // 1, X, o 2
+  userPleonoPrediction  Int?       // Predicción de goles (Pleno al Quince)
+  actualResult          String?    // 1, X, o 2 (después de partido)
+  actualPleonoResult    Int?       // Goles reales
+  isCorrect             Boolean    @default(false) // ¿Acertó?
+  createdAt             DateTime   @default(now())
+  updatedAt             DateTime   @updatedAt
+
+  prediction    Prediction @relation(fields: [predictionId], references: [id], onDelete: Cascade)
+
+  @@index([predictionId])
 }
 
 model Prize {
