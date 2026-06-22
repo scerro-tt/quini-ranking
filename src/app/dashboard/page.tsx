@@ -41,89 +41,65 @@ export default async function DashboardPage() {
           <Card>
             <CardHeader>
               <CardTitle>Temporadas</CardTitle>
-              <CardDescription>Gestiona y visualiza temporadas</CardDescription>
+              <CardDescription>Gestiona temporadas y jornadas</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-600 mb-4">
-                Aún no hay temporadas activas. Crea una para comenzar.
+                Crea temporadas, agrega jornadas e ingresa predicciones.
               </p>
               <Link href="/dashboard/seasons">
-                <Button className="w-full">Ver temporadas</Button>
+                <Button className="w-full">Ir a Temporadas</Button>
               </Link>
             </CardContent>
           </Card>
 
-          {/* Jornadas Card */}
+          {/* Quick Start Card */}
           <Card>
             <CardHeader>
-              <CardTitle>Jornadas</CardTitle>
-              <CardDescription>Carga resultados y premios</CardDescription>
+              <CardTitle>Comenzar</CardTitle>
+              <CardDescription>Guía rápida de primeros pasos</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
-                Sigue el progreso de cada jornada de la temporada.
+            <CardContent className="space-y-2">
+              <p className="text-sm text-gray-600">
+                1. Crea una temporada
               </p>
-              <Link href="/dashboard/jornadas">
-                <Button className="w-full" disabled>
-                  Ver jornadas (próximamente)
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          {/* Ranking Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Ranking</CardTitle>
-              <CardDescription>Visualiza la clasificación actual</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
-                Mira dónde estás en el ranking según premios y aciertos.
+              <p className="text-sm text-gray-600">
+                2. Agrega jornadas
               </p>
-              <Link href="/dashboard/ranking">
-                <Button className="w-full" disabled>
-                  Ver ranking (próximamente)
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          {/* Stats Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Estadísticas</CardTitle>
-              <CardDescription>Tu desempeño en la temporada</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 mb-4">
-                Premios cobrados, aciertos y puntos acumulados.
+              <p className="text-sm text-gray-600">
+                3. Ingresa predicciones
               </p>
-              <Link href="/dashboard/stats">
-                <Button className="w-full" disabled>
-                  Ver estadísticas (próximamente)
-                </Button>
-              </Link>
+              <p className="text-sm text-gray-600">
+                4. Calcula ranking
+              </p>
             </CardContent>
           </Card>
         </div>
 
         {/* Info */}
-        <Card className="mt-8">
+        <Card className="mt-8 bg-blue-50 border-blue-200">
           <CardHeader>
-            <CardTitle>Bienvenido al dashboard</CardTitle>
+            <CardTitle className="text-blue-900">Sistema de Puntuación</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <h3 className="font-semibold mb-2">Próximos pasos:</h3>
-              <ol className="text-sm text-gray-600 space-y-2 list-decimal list-inside">
-                <li>Crear una temporada (ej: 2025-2026)</li>
-                <li>Agregar jornadas de la temporada</li>
-                <li>Cargar premios reales por jornada</li>
-                <li>Ingresar tus pronósticos y aciertos</li>
-                <li>Ver el ranking actualizado automáticamente</li>
-              </ol>
-            </div>
+          <CardContent className="space-y-3 text-sm text-blue-800">
+            <p>
+              <strong>Total = Premios + Aciertos válidos</strong>
+            </p>
+            <ul className="space-y-2 ml-4">
+              <li>
+                <strong>Premios (€):</strong> Dinero real cuando haces 10+ aciertos
+              </li>
+              <li>
+                <strong>Aciertos:</strong> Puntos por semanas sin premio (tabla 4-9 aciertos)
+              </li>
+              <li>
+                <strong>Regla importante:</strong> Los aciertos solo cuentan si cobraste al menos
+                un premio en toda la temporada
+              </li>
+            </ul>
+            <p className="text-xs opacity-75 mt-2">
+              Quien menos suma al final, paga la camiseta.
+            </p>
           </CardContent>
         </Card>
       </main>
