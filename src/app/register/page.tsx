@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { register } from '@/actions/auth'
-import { login } from '@/actions/auth'
 import { Button } from '@/components/button'
 import { Input } from '@/components/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/card'
@@ -69,9 +68,9 @@ export default function RegisterPage() {
       if (result.error) {
         setError(result.error)
       } else {
-        // Auto-login after registration
-        await login(formData.email, formData.password)
-        router.push('/dashboard')
+        // Redirige a login para que el usuario ingrese manualmente
+        // NextAuth manejará la redirección a dashboard si está logueado
+        router.push('/login')
       }
     } catch (err) {
       setError('Error al registrarse. Intenta de nuevo.')
