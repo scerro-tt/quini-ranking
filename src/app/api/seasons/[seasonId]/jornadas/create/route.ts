@@ -1,16 +1,19 @@
-import { auth } from '@/auth'
 import { db } from '@/lib/db'
 import { NextRequest, NextResponse } from 'next/server'
+import { headers } from 'next/headers'
 
 export async function POST(
   request: NextRequest,
   { params }: { params: { seasonId: string } }
 ) {
   try {
-    const session = await auth()
-    console.log('API Route Session:', JSON.stringify(session, null, 2))
+    // Get session from headers (set by middleware)
+    const headersList = await headers()
+    const userId = headersList.get('x-user-id')
 
-    if (!session?.user?.id) {
+    console.log('API Route userId:', userId)
+
+    if (!userId) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
     }
 
@@ -35,7 +38,7 @@ export async function POST(
     const jornada = await db.jornada.create({
       data: {
         seasonId: params.seasonId,
-        userId: session.user.id,
+        userId,
         weekNumber,
         matchDate: new Date(matchDate),
       },
