@@ -6,8 +6,7 @@ import { auth } from '@/auth'
 export async function createJornada(
   seasonId: string,
   weekNumber: number,
-  matchDate: Date,
-  prizeU?: number
+  matchDate: Date
 ) {
   const session = await auth()
   if (!session?.user?.id) throw new Error('Not authenticated')
@@ -24,9 +23,9 @@ export async function createJornada(
   const jornada = await db.jornada.create({
     data: {
       seasonId,
+      userId: session.user.id,
       weekNumber,
       matchDate,
-      prizeU: prizeU || 1.5,
     },
   })
 
@@ -76,4 +75,36 @@ export async function deleteJornada(jornadaId: string) {
 
   await db.jornada.delete({ where: { id: jornadaId } })
   return { success: true }
+}
+
+export async function updateJornadaPremios(
+  jornadaId: string,
+  premios: {
+    premio10?: number
+    premio11?: number
+    premio12?: number
+    premio13?: number
+    premio14?: number
+    premio15?: number
+  }
+) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Not authenticated')
+
+  const jornada = await db.jornada.findUnique({ where: { id: jornadaId } })
+  if (!jornada) throw new Error('Jornada not found')
+
+  const updated = await db.jornada.update({
+    where: { id: jornadaId },
+    data: {
+      premio10: premios.premio10,
+      premio11: premios.premio11,
+      premio12: premios.premio12,
+      premio13: premios.premio13,
+      premio14: premios.premio14,
+      premio15: premios.premio15,
+    },
+  })
+
+  return { success: true, jornada: updated }
 }

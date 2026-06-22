@@ -73,20 +73,31 @@ model SeasonUser {
 model Jornada {
   id            String     @id @default(cuid())
   seasonId      String
+  userId        String     // Usuario que creó la jornada
   weekNumber    Int        // 1-42 aproximadamente
   matchDate     DateTime   // Fecha del partido
   boleto        String?    // JSON string con pronósticos
-  prizeU        Float?     // Premio del 10 aciertos (U en el documento)
   totalMatches  Int        @default(14) // Cantidad de partidos en la jornada
+
+  // Premios (ingresados manualmente después de finalizada)
+  premio15      Float?     // Premio por 15 aciertos
+  premio14      Float?     // Premio por 14 aciertos
+  premio13      Float?     // Premio por 13 aciertos
+  premio12      Float?     // Premio por 12 aciertos
+  premio11      Float?     // Premio por 11 aciertos
+  premio10      Float?     // Premio por 10 aciertos
+
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 
   season        Season     @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  creator       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   predictions   Prediction[]
   prizes        Prize[]
 
   @@unique([seasonId, weekNumber])
   @@index([seasonId])
+  @@index([userId])
 }
 
 model Prediction {

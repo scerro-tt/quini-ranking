@@ -35,7 +35,6 @@ export default function SeasonDetailPage() {
   const [formData, setFormData] = useState({
     weekNumber: 1,
     matchDate: new Date().toISOString().split('T')[0],
-    prizeU: 1.5,
   })
   const [error, setError] = useState('')
 
@@ -66,8 +65,7 @@ export default function SeasonDetailPage() {
       const result = await createJornada(
         seasonId,
         formData.weekNumber,
-        new Date(formData.matchDate),
-        formData.prizeU
+        new Date(formData.matchDate)
       )
 
       if ('error' in result) {
@@ -76,7 +74,6 @@ export default function SeasonDetailPage() {
         setFormData({
           weekNumber: formData.weekNumber + 1,
           matchDate: new Date().toISOString().split('T')[0],
-          prizeU: 1.5,
         })
         setShowForm(false)
         await loadData()
@@ -123,7 +120,7 @@ export default function SeasonDetailPage() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleCreateJornada} className="space-y-4">
-                <div className="grid md:grid-cols-3 gap-4">
+                <div className="grid md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">Semana</label>
                     <Input
@@ -143,19 +140,6 @@ export default function SeasonDetailPage() {
                       type="date"
                       value={formData.matchDate}
                       onChange={(e) => setFormData({ ...formData, matchDate: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Premio U (€)</label>
-                    <Input
-                      type="number"
-                      min="1.5"
-                      step="0.01"
-                      value={formData.prizeU}
-                      onChange={(e) =>
-                        setFormData({ ...formData, prizeU: parseFloat(e.target.value) })
-                      }
                       required
                     />
                   </div>
