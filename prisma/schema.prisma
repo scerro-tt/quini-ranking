@@ -21,6 +21,7 @@ model User {
   // Relations
   predictions   Prediction[]
   seasonUsers   SeasonUser[]
+  jornadas      Jornada[]
 
   @@index([email])
 }

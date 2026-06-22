@@ -8,28 +8,30 @@ export async function createJornada(
   weekNumber: number,
   matchDate: Date
 ) {
-  const session = await auth()
-  if (!session?.user?.id) throw new Error('Not authenticated')
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_APP_URL}/api/seasons/${seasonId}/jornadas/create`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          weekNumber,
+          matchDate,
+        }),
+      }
+    )
 
-  const season = await db.season.findUnique({ where: { id: seasonId } })
-  if (!season) throw new Error('Season not found')
+    const data = await response.json()
 
-  const existing = await db.jornada.findUnique({
-    where: { seasonId_weekNumber: { seasonId, weekNumber } },
-  })
+    if (!response.ok) {
+      return { error: data.error || 'Error creating jornada' }
+    }
 
-  if (existing) return { error: 'Week already exists in this season' }
-
-  const jornada = await db.jornada.create({
-    data: {
-      seasonId,
-      userId: session.user.id,
-      weekNumber,
-      matchDate,
-    },
-  })
-
-  return { success: true, jornada }
+    return { success: true, jornada: data.jornada }
+  } catch (error) {
+    console.error('Error in createJornada:', error)
+    return { error: 'Error creating jornada' }
+  }
 }
 
 export async function getJornadasForSeason(seasonId: string) {

@@ -15,9 +15,11 @@ export const authConfig = {
       return token
     },
     async session({ session, token }) {
+      console.log('Session callback - token.id:', token.id)
       if (session.user) {
         session.user.id = token.id as string
       }
+      console.log('Session callback - session.user.id:', session.user?.id)
       return session
     },
   },
